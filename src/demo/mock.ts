@@ -465,8 +465,8 @@ function get(path: string, qs: URLSearchParams): Json {
   if (p.startsWith("/update"))
     return {
       // The raw server shape — the API client turns it into server/web rows.
-      current_server_version: "0.2.0",
-      current_web_version: "0.2.0",
+      current_server_version: "0.2.1",
+      current_web_version: "0.2.1",
       server_update: null,
       web_update: null,
       incompatible_web_update: null,
