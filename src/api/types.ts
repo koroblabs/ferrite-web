@@ -1273,6 +1273,8 @@ export interface SecureDnsDevice {
   /** Android's Private DNS name; only with DNS over TLS on 853. */
   android?: string | null;
   doh_url?: string | null;
+  /** For apps that speak DNS over QUIC. */
+  doq_url?: string | null;
   /** An Apple profile can be made for it. */
   apple?: boolean;
   /** Made just now. */
@@ -1324,6 +1326,8 @@ export interface SecureDnsSettings {
   devices?: string[];
   /** DNS over HTTPS over HTTP/3 too, on the DoH port's UDP side. */
   http3?: boolean;
+  /** DNS over QUIC too, on the DoT port's UDP side. */
+  doq?: boolean;
   /** Reverse proxies whose X-Real-IP / X-Forwarded-For is believed. */
   proxies?: string[];
   self_setup?: SelfSetup;
@@ -1350,6 +1354,9 @@ export interface SecureDnsStatus {
   /** DNS over HTTPS over HTTP/3, on the DoH port's UDP side. */
   doh3?: boolean;
   doh3_error?: string | null;
+  /** DNS over QUIC, on the DoT port's UDP side. */
+  doq?: boolean;
+  doq_error?: string | null;
   cert: { names: string[]; issuer: string; not_before: number; not_after: number } | null;
   cert_warning: string | null;
   acme: SecureDnsAcmeStatus | null;
@@ -1363,7 +1370,13 @@ export interface SecureDnsView {
   /** A Cloudflare token is saved (it is never sent back). */
   token_set: boolean;
   status: SecureDnsStatus;
-  setup: { dot_host: string | null; dot_port: number; doh_url: string | null };
+  setup: {
+    dot_host: string | null;
+    dot_port: number;
+    doh_url: string | null;
+    /** quic://host[:port]; a device's ID goes in front of the host. */
+    doq_url?: string | null;
+  };
 }
 
 /** `[relay]`: the box keeps a connection out to a relay, which passes on

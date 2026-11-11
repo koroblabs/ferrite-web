@@ -526,6 +526,33 @@ export function SecureDnsCard() {
           </div>
         </SettingRow>
       )}
+      {form.dot_port !== 0 && (
+        <SettingRow
+          label={t("secure.doq", { defaultValue: "DNS over QUIC" })}
+          sub={t("secure.doq_sub", {
+            port: form.dot_port,
+            defaultValue:
+              "On UDP {{port}}, for apps that speak it, such as AdGuard; a device names itself as over TLS. Phones' own settings don't offer it. Away from home the router has to send UDP {{port}} straight here.",
+          })}
+          align="start"
+        >
+          <div className="flex flex-col items-end gap-1.5">
+            <Switch checked={form.doq ?? true} onCheckedChange={(v) => set("doq", v)} />
+            {on &&
+              (view.config.doq ?? true) &&
+              (st.doq ? (
+                <Tag tone="cached">
+                  {t("secure.doq_on", {
+                    port: view.config.dot_port,
+                    defaultValue: "listening on {{port}}/udp",
+                  })}
+                </Tag>
+              ) : (
+                st.doq_error && <Tag tone="blocked">{st.doq_error}</Tag>
+              ))}
+          </div>
+        </SettingRow>
+      )}
       {(form.doh_port !== 0 || form.proxyText !== "") && (
         <SettingRow
           label={t("secure.proxies", { defaultValue: "Reverse proxy" })}
@@ -592,6 +619,10 @@ export function SecureDnsCard() {
               {devices.map((d) => {
                 const dot = view.setup.dot_host ? `${d}.${view.setup.dot_host}` : null;
                 const doh = view.setup.doh_url ? `${view.setup.doh_url}/${d}` : null;
+                // The ID goes in the TLS name, as over TLS: quic://<id>.<host>.
+                const doq = view.setup.doq_url
+                  ? view.setup.doq_url.replace("quic://", `quic://${d}.`)
+                  : null;
                 return (
                   <li key={d} className="space-y-2.5 p-3">
                     <div className="flex items-center gap-2">
@@ -607,7 +638,7 @@ export function SecureDnsCard() {
                         <Trash2 size={13} />
                       </IconBtn>
                     </div>
-                    <DeviceHowTo id={d} android={dot} doh={doh} grid="lg:grid-cols-3" />
+                    <DeviceHowTo id={d} android={dot} doh={doh} doq={doq} grid="lg:grid-cols-3" />
                   </li>
                 );
               })}

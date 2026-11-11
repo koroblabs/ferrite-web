@@ -626,6 +626,10 @@ function secureDevice(name: string, make: boolean): Json {
     doh_url: c.doh_port
       ? `https://${c.hostname}${c.doh_port === 443 ? "" : `:${c.doh_port}`}/dns-query/${id}`
       : null,
+    doq_url:
+      c.doq !== false && c.dot_port
+        ? `quic://${id}.${c.hostname}${c.dot_port === 853 ? "" : `:${c.dot_port}`}`
+        : null,
   };
 }
 
@@ -648,6 +652,8 @@ function secureView(): Json {
       doh_shared: on && c.doh_port === 443,
       doh3: on && c.doh_port !== 0 && c.http3 !== false,
       doh3_error: null,
+      doq: on && c.dot_port !== 0 && c.doq !== false,
+      doq_error: null,
       cert: on
         ? {
             names: [c.hostname, `*.${c.hostname}`],
@@ -677,6 +683,10 @@ function secureView(): Json {
           ? c.doh_port === 443
             ? `https://${c.hostname}/dns-query`
             : `https://${c.hostname}:${c.doh_port}/dns-query`
+          : null,
+      doq_url:
+        c.hostname && c.dot_port && c.doq !== false
+          ? `quic://${c.hostname}${c.dot_port === 853 ? "" : `:${c.dot_port}`}`
           : null,
     },
   };

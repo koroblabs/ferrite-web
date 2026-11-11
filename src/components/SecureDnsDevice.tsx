@@ -63,18 +63,21 @@ export function QrCode({ value, size = 200 }: { value: string; size?: number }) 
 /**
  * What to type into a device for `id`: Android's Private DNS name, an Apple
  * profile (on this device, or as a QR code for another), the DNS over HTTPS
- * address. `grid` lays the three side by side where there's room.
+ * address, and the DNS over QUIC one for apps that speak it. `grid` lays
+ * them side by side where there's room.
  */
 export function DeviceHowTo({
   id,
   android,
   doh,
+  doq,
   apple = true,
   grid,
 }: {
   id: string;
   android?: string | null;
   doh?: string | null;
+  doq?: string | null;
   apple?: boolean;
   grid?: string;
 }) {
@@ -164,6 +167,14 @@ export function DeviceHowTo({
           <Copyable value={doh} />
         </div>
       )}
+      {doq && (
+        <div className="min-w-0 space-y-1">
+          <FieldLabel>
+            {t("secure.doq_url", { defaultValue: "Apps such as AdGuard · DNS over QUIC" })}
+          </FieldLabel>
+          <Copyable value={doq} />
+        </div>
+      )}
     </div>
   );
 }
@@ -227,7 +238,13 @@ export function SecureDnsSection({
               defaultValue: "Set up as {{id}}; answered away from home too.",
             })}
           </p>
-          <DeviceHowTo id={dev.id} android={dev.android} doh={dev.doh_url} apple={dev.apple} />
+          <DeviceHowTo
+            id={dev.id}
+            android={dev.android}
+            doh={dev.doh_url}
+            doq={dev.doq_url}
+            apple={dev.apple}
+          />
         </div>
       ) : (
         <div className="space-y-2">
