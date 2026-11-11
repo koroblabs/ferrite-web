@@ -1,0 +1,5 @@
+overrides:
+  # GHSA-g3hv-75wg-m249: minimatch >=7 <11.0.1. Only eslint and typescript-eslint
+  # pull it in (lint time), and they use nothing that 11 removed. Drop this once
+  # they depend on ^11 themselves.
+  minimatch: ^11.0.1

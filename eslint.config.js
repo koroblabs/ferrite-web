@@ -2,7 +2,7 @@ import js from "@eslint/js";
 import globals from "globals";
 import reactHooks from "eslint-plugin-react-hooks";
 import reactRefresh from "eslint-plugin-react-refresh";
-import react from "eslint-plugin-react";
+import eslintReact from "@eslint-react/eslint-plugin";
 import tseslint from "@typescript-eslint/eslint-plugin";
 import tsParser from "@typescript-eslint/parser";
 import { defineConfig, globalIgnores } from "eslint/config";
@@ -23,8 +23,6 @@ export default defineConfig([
         rules: { "react-refresh/only-export-components": ["warn", { allowConstantExport: true }] },
       },
     ],
-    plugins: { react },
-    settings: { react: { version: "detect" } },
     languageOptions: {
       ecmaVersion: "latest",
       globals: { ...globals.browser, ...globals.node },
@@ -36,7 +34,6 @@ export default defineConfig([
     rules: {
       // Переменные.
       // destructuredArrayIgnorePattern покрывает { icon: Icon } — Icon начинается с заглавной.
-      // jsx-uses-vars говорит ESLint что <Icon /> — это использование переменной Icon.
       "no-unused-vars": [
         "warn",
         {
@@ -47,15 +44,6 @@ export default defineConfig([
         },
       ],
       "no-console": ["warn", { allow: ["warn", "error"] }],
-
-      // React
-      "react/jsx-uses-vars": "error", // <Icon /> считается использованием Icon
-      "react/jsx-uses-react": "off", // не нужен с new JSX transform
-      "react/react-in-jsx-scope": "off",
-      "react/jsx-no-target-blank": "error",
-      "react/jsx-key": "error",
-      "react/no-unknown-property": "error",
-      "react/self-closing-comp": "warn",
     },
   },
 
@@ -65,9 +53,8 @@ export default defineConfig([
     plugins: {
       "@typescript-eslint": tseslint,
       "react-hooks": reactHooks,
-      react,
+      "@eslint-react": eslintReact,
     },
-    settings: { react: { version: "detect" } },
     languageOptions: {
       parser: tsParser,
       parserOptions: {
@@ -89,9 +76,6 @@ export default defineConfig([
           caughtErrorsIgnorePattern: "^_",
         },
       ],
-      "react/jsx-uses-vars": "error",
-      "react/jsx-uses-react": "off",
-      "react/react-in-jsx-scope": "off",
       "@typescript-eslint/no-explicit-any": "warn",
       "@typescript-eslint/consistent-type-imports": [
         "warn",
@@ -102,10 +86,10 @@ export default defineConfig([
       "react-hooks/rules-of-hooks": "error",
       "react-hooks/exhaustive-deps": "warn",
 
-      // React
-      "react/jsx-key": "error",
-      "react/no-unknown-property": "error",
-      "react/self-closing-comp": "warn",
+      // React (@eslint-react; @typescript-eslint/no-unused-vars already counts <Icon /> as a use)
+      "@eslint-react/no-missing-key": "error",
+      "@eslint-react/dom-no-unknown-property": "error",
+      "@eslint-react/dom-no-unsafe-target-blank": "error",
 
       "no-console": ["warn", { allow: ["warn", "error"] }],
     },
