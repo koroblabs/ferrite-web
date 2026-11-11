@@ -14,6 +14,7 @@ import * as stats from "./stats";
 import * as queries from "./queries";
 import * as clients from "./clients";
 import * as blocklist from "./blocklist";
+import * as breakage from "./breakage";
 import * as lists from "./lists";
 import * as dns from "./dns";
 import * as settings from "./settings";
@@ -91,6 +92,11 @@ export const api = {
 
   getProfiles: blocklist.getProfiles,
   putProfiles: (profiles: BlocklistProfile[]) => blocklist.putProfiles(profiles),
+
+  // ── Likely breakage ─────────────────────────────────────────────────────────
+  breakage: breakage.get,
+  ignoreBreakage: (domain: string) => breakage.ignore(domain),
+  unignoreBreakage: (domain: string) => breakage.unignore(domain),
 
   // ── Service catalog ─────────────────────────────────────────────────────────
   serviceCatalog: services.catalog,

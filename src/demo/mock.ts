@@ -496,6 +496,7 @@ function get(path: string, qs: URLSearchParams): Json {
         { domain: "i.instagram.com", site: "instagram.com", seen: 1, direct: true, tunnel: true, suggested: false },
       ],
     };
+  if (p === "/breakage") return breakageView();
   if (p === "/setup")
     return {
       state: "ready",
@@ -692,7 +693,36 @@ function secureView(): Json {
   };
 }
 
+// One name that seems to break a phone, until it's allowed or kept blocked.
+let breakageSettled = false;
+
+function breakageView(): Json {
+  const now = Math.floor(Date.now() / 1000);
+  return {
+    suspects: breakageSettled
+      ? []
+      : [
+          {
+            domain: "graph.instagram.com",
+            site: "Instagram",
+            tries: 6,
+            first: now - 540,
+            last: now - 40,
+            lists: ["SessionReplay"],
+            devices: [{ device: "02:63:58:8d:22:ef", name: "pixel-8-pro", ips: ["192.168.1.42"] }],
+          },
+        ],
+    ignored: [],
+  };
+}
+
 function write(method: string, path: string, body: Json): Json {
+  if (path === "/breakage/ignore" || path.startsWith("/breakage/ignore/")) {
+    breakageSettled = method !== "DELETE";
+    return { domain: String(body?.domain ?? ""), persisted: true };
+  }
+  if (path === "/blocklist/whitelist" && body?.domain === "graph.instagram.com")
+    breakageSettled = true;
   if (path === "/auth" || path === "/auth/login") return { token: "demo", expires_in: 86400 };
   if (path === "/dhcp/check")
     return { servers: [], checked_at: Math.floor(Date.now() / 1000), error: null };

@@ -8,6 +8,7 @@ import {
   Moon,
   Pause,
   RefreshCw,
+  Unplug,
   UserCog,
   UserPlus,
   Users,
@@ -15,6 +16,8 @@ import {
 } from "lucide-react";
 import { api } from "@/api";
 import type {
+  BreakageResponse,
+  BreakageSuspect,
   ClientEntry,
   ProfilesResponse,
   ProxyStatsResponse,
@@ -24,7 +27,8 @@ import type {
 import { cn } from "@/lib/utils";
 import { relTime } from "@/lib/format";
 import { Card } from "@/components/layout/Card";
-import { Skeleton } from "@/components/ui";
+import { Btn, Skeleton } from "@/components/ui";
+import { useToast } from "@/hooks/use-toast";
 import { usePageVisible } from "@/hooks/use-page-visible";
 import { usePause, fmtCountdown } from "@/stores/pause";
 
@@ -45,14 +49,26 @@ const TONE: Record<Tone, string> = {
   muted: "bg-white/5 text-muted",
 };
 
+interface Action {
+  label: string;
+  title?: string;
+  primary?: boolean;
+  run: () => Promise<void>;
+}
+
 interface Row {
   key: string;
   icon: ComponentType<{ size?: number; className?: string }>;
   tone: Tone;
   title: string;
   sub?: string;
-  to: string;
+  /** The page the line opens; a line with `actions` opens none. */
+  to?: string;
+  actions?: Action[];
 }
+
+/** Lines about names that seem to break a device, at most. */
+const BREAKAGE_SHOWN = 2;
 
 interface Snapshot {
   clients: ClientEntry[] | null;
@@ -60,6 +76,7 @@ interface Snapshot {
   proxy: ProxyStatsResponse | null;
   sync: SyncView | null;
   update: UpdateCheckResponse | null;
+  breakage: BreakageResponse | null;
 }
 
 function value<T>(r: PromiseSettledResult<T>): T | null {
@@ -95,6 +112,94 @@ export function RightNow() {
   const visible = usePageVisible();
   const pause = usePause();
   const [snap, setSnap] = useState<Snapshot | null>(null);
+  const toast = useToast();
+
+  /** Done with a name, either way: its line goes at once. */
+  function settled(domain: string) {
+    setSnap((s) =>
+      s?.breakage
+        ? {
+            ...s,
+            breakage: {
+              ...s.breakage,
+              suspects: s.breakage.suspects.filter((x) => x.domain !== domain),
+            },
+          }
+        : s,
+    );
+  }
+
+  function breakageRow(b: BreakageSuspect): Row {
+    const first = b.devices[0];
+    const device =
+      (first?.name ?? first?.device ?? "") +
+      (b.devices.length > 1 ? ` +${b.devices.length - 1}` : "");
+    const list = b.lists[0] + (b.lists.length > 1 ? ` +${b.lists.length - 1}` : "");
+    return {
+      key: `broken-${b.domain}`,
+      icon: Unplug,
+      tone: "warn",
+      title: t("now.broken", {
+        site: b.site,
+        device,
+        defaultValue: "{{site}} may not work on {{device}}",
+      }),
+      sub: t("now.broken_sub", {
+        list,
+        domain: b.domain,
+        count: b.tries,
+        defaultValue: "{{list}} blocks {{domain}}, asked {{count}} times",
+      }),
+      actions: [
+        {
+          label: t("now.broken_allow", { defaultValue: "Allow" }),
+          title: t("now.broken_allow_title", {
+            domain: b.domain,
+            defaultValue: "Allow {{domain}} for every device",
+          }),
+          primary: true,
+          run: async () => {
+            await api.addWhitelist(b.domain);
+            settled(b.domain);
+            toast(
+              t("now.broken_allowed", {
+                domain: b.domain,
+                defaultValue: "{{domain}} is allowed for every device",
+              }),
+              "success",
+              8000,
+              {
+                label: t("common.undo", { defaultValue: "Undo" }),
+                onClick: () => void api.removeWhitelist(b.domain),
+              },
+            );
+          },
+        },
+        {
+          label: t("now.broken_keep", { defaultValue: "Keep blocked" }),
+          title: t("now.broken_keep_title", {
+            defaultValue: "The block is fine; don't suggest it again",
+          }),
+          run: async () => {
+            await api.ignoreBreakage(b.domain);
+            settled(b.domain);
+            toast(
+              t("now.broken_kept", {
+                domain: b.domain,
+                defaultValue: "{{domain}} stays blocked and won't be suggested again",
+              }),
+              "success",
+              8000,
+              {
+                label: t("common.undo", { defaultValue: "Undo" }),
+                onClick: () => void api.unignoreBreakage(b.domain),
+              },
+            );
+          },
+        },
+      ],
+    };
+  }
 
   useEffect(() => {
     if (!visible) return;
@@ -106,7 +211,8 @@ export function RightNow() {
         api.proxyStats(),
         api.getSync(),
         api.checkUpdate(),
-      ]).then(([c, p, x, s, u]) => {
+        api.breakage(),
+      ]).then(([c, p, x, s, u, b]) => {
         if (!alive) return;
         setSnap({
           clients: value(c)?.clients ?? null,
@@ -114,6 +220,7 @@ export function RightNow() {
           proxy: value(x),
           sync: value(s),
           update: value(u),
+          breakage: value(b),
         });
       });
     void load();
@@ -155,6 +262,10 @@ export function RightNow() {
         }),
         to: "/tunnels",
       });
+    }
+
+    for (const b of (snap.breakage?.suspects ?? []).slice(0, BREAKAGE_SHOWN)) {
+      rows.push(breakageRow(b));
     }
 
     if (pause.clientLeft.size > 0) {
@@ -298,36 +409,110 @@ export function RightNow() {
         </p>
       ) : (
         <ul className="pb-2">
-          {rows.map(({ key, icon: Icon, tone, title, sub, to }) => (
-            <li key={key}>
-              <button
-                type="button"
-                onClick={() => navigate(to)}
-                className="group flex w-full items-center gap-3 px-5 py-2.5 text-left transition-colors hover:bg-white/3"
-              >
-                <span
-                  className={cn(
-                    "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg",
-                    TONE[tone],
-                  )}
+          {rows.map(({ key, icon: Icon, tone, title, sub, to, actions }) =>
+            actions ? (
+              <ActionLine
+                key={key}
+                icon={Icon}
+                tone={tone}
+                title={title}
+                sub={sub}
+                actions={actions}
+              />
+            ) : (
+              <li key={key}>
+                <button
+                  type="button"
+                  onClick={() => to && navigate(to)}
+                  className="group flex w-full items-center gap-3 px-5 py-2.5 text-left transition-colors hover:bg-white/3"
                 >
-                  <Icon size={15} />
-                </span>
-                <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[13.5px] font-medium text-heading">
-                    {title}
+                  <span
+                    className={cn(
+                      "flex h-8 w-8 shrink-0 items-center justify-center rounded-lg",
+                      TONE[tone],
+                    )}
+                  >
+                    <Icon size={15} />
                   </span>
-                  {sub && <span className="block truncate text-xs text-muted">{sub}</span>}
-                </span>
-                <ChevronRight
-                  size={14}
-                  className="shrink-0 text-muted/60 transition-colors group-hover:text-ember"
-                />
-              </button>
-            </li>
-          ))}
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-[13.5px] font-medium text-heading">
+                      {title}
+                    </span>
+                    {sub && <span className="block truncate text-xs text-muted">{sub}</span>}
+                  </span>
+                  <ChevronRight
+                    size={14}
+                    className="shrink-0 text-muted/60 transition-colors group-hover:text-ember"
+                  />
+                </button>
+              </li>
+            ),
+          )}
         </ul>
       )}
     </Card>
+  );
+}
+
+/** A line that asks for a decision instead of opening a page: its buttons
+ *  sit under the text, so it fits the narrow card too. */
+function ActionLine({
+  icon: Icon,
+  tone,
+  title,
+  sub,
+  actions,
+}: {
+  icon: Row["icon"];
+  tone: Tone;
+  title: string;
+  sub?: string;
+  actions: Action[];
+}) {
+  const toast = useToast();
+  const [busy, setBusy] = useState(false);
+  async function run(a: Action) {
+    setBusy(true);
+    try {
+      await a.run();
+    } catch (e) {
+      toast((e as Error).message, "error");
+    } finally {
+      setBusy(false);
+    }
+  }
+  return (
+    <li className="flex items-start gap-3 px-5 py-2.5">
+      <span
+        className={cn("flex h-8 w-8 shrink-0 items-center justify-center rounded-lg", TONE[tone])}
+      >
+        <Icon size={15} />
+      </span>
+      <span className="min-w-0 flex-1">
+        <span className="block truncate text-[13.5px] font-medium text-heading" title={title}>
+          {title}
+        </span>
+        {sub && (
+          <span className="block truncate text-xs text-muted" title={sub}>
+            {sub}
+          </span>
+        )}
+        <span className="mt-2 flex flex-wrap gap-1.5">
+          {actions.map((a) => (
+            <Btn
+              key={a.label}
+              type="button"
+              size="sm"
+              variant={a.primary ? "primary" : "ghost"}
+              title={a.title}
+              disabled={busy}
+              onClick={() => void run(a)}
+            >
+              {a.label}
+            </Btn>
+          ))}
+        </span>
+      </span>
+    </li>
   );
 }

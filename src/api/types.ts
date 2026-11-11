@@ -1408,3 +1408,26 @@ export interface RelayView {
   id: string | null;
   status: RelayStatus | null;
 }
+
+// ── Likely breakage ──────────────────────────────────────────────────────────
+
+/** A blocked name devices keep asking for while they use the site it belongs to. */
+export interface BreakageSuspect {
+  domain: string;
+  /** The site it belongs to: a catalog service's name, or the registrable domain. */
+  site: string;
+  /** Tries in the last ten minutes, at the latest. */
+  tries: number;
+  /** Unix seconds. */
+  first: number;
+  last: number;
+  /** The subscription lists that block it. */
+  lists: string[];
+  devices: { device: string; name: string | null; ips: string[] }[];
+}
+
+export interface BreakageResponse {
+  suspects: BreakageSuspect[];
+  /** Names set aside as fine to keep blocked. */
+  ignored: string[];
+}
