@@ -849,11 +849,11 @@
   },
   "mcp": {
     "title": "AI assistants (MCP)",
-    "sub": "Lets an assistant such as Claude ask ferrite why a site is blocked, what a device looked up, or how the tunnels are doing — over the Model Context Protocol.",
+    "sub": "Lets an assistant such as Claude find out why a site doesn't work on a device and what would fix it, what a device looked up, or how the tunnels are doing — over the Model Context Protocol.",
     "enabled": "Allow assistants to connect",
     "enabled_sub": "They sign in with the API key and can read the query log, devices and settings.",
     "allow_changes": "Allow changes",
-    "allow_changes_sub": "Also let them block or allow domains, block services, pause filtering and refresh lists. Off: they can look but not touch.",
+    "allow_changes_sub": "Also let them block or allow domains, block services, pause filtering, move devices between profiles, route names through tunnels and refresh lists. Off: they can look but not touch.",
     "no_key": "Set an API key above first — assistants sign in with it. Without one, anyone on the network who finds the endpoint can use it.",
     "connect": "Connect Claude Code",
     "connect_other": "Other assistants: Streamable HTTP at {{url}}, header Authorization: Bearer <API key>."

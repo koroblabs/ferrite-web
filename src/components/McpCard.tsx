@@ -76,7 +76,7 @@ export function McpCard({ apiKeySet }: { apiKeySet: boolean }) {
       title={t("mcp.title", { defaultValue: "AI assistants (MCP)" })}
       sub={t("mcp.sub", {
         defaultValue:
-          "Lets an assistant such as Claude ask ferrite why a site is blocked, what a device looked up, or how the tunnels are doing — over the Model Context Protocol.",
+          "Lets an assistant such as Claude find out why a site doesn't work on a device and what would fix it, what a device looked up, or how the tunnels are doing \u2014 over the Model Context Protocol.",
       })}
     >
       <SettingRow
@@ -96,7 +96,7 @@ export function McpCard({ apiKeySet }: { apiKeySet: boolean }) {
         label={t("mcp.allow_changes", { defaultValue: "Allow changes" })}
         sub={t("mcp.allow_changes_sub", {
           defaultValue:
-            "Also let them block or allow domains, block services, pause filtering and refresh lists. Off: they can look but not touch.",
+            "Also let them block or allow domains, block services, pause filtering, move devices between profiles, route names through tunnels and refresh lists. Off: they can look but not touch.",
         })}
       >
         <Switch
