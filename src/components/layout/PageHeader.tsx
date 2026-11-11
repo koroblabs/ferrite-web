@@ -9,9 +9,9 @@ interface PageHeaderProps {
 
 export function PageHeader({ title, subtitle, action }: PageHeaderProps) {
   useEffect(() => {
-    document.title = `${title} · ferrite`;
+    document.title = `${title} · Ferrite`;
     return () => {
-      document.title = "ferrite";
+      document.title = "Ferrite";
     };
   }, [title]);
 

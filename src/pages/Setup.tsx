@@ -75,7 +75,7 @@ export default function Setup() {
           </li>
           <li>
             {t("setup.step_pick", {
-              defaultValue: "Settings → General → VPN & Device Management → DNS: pick ferrite.",
+              defaultValue: "Settings → General → VPN & Device Management → DNS: pick Ferrite.",
             })}
           </li>
         </ol>
@@ -149,7 +149,7 @@ export default function Setup() {
         {say(
           t("setup.unnamed", {
             defaultValue:
-              "ferrite doesn't know this device by name yet. Ask whoever runs the network to name it under Clients, then come back here.",
+              "Ferrite doesn't know this device by name yet. Ask whoever runs the network to name it under Clients, then come back here.",
           }),
         )}
         <p className="font-mono text-[11px] text-muted">

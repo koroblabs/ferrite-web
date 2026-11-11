@@ -330,7 +330,7 @@ export default function Dhcp() {
         title={t("dhcp.title", { defaultValue: "DHCP" })}
         subtitle={t("dhcp.subtitle", {
           defaultValue:
-            "Hand out addresses on your network, with ferrite as every device's DNS — for routers that won't let you change it.",
+            "Hand out addresses on your network, with Ferrite as every device's DNS — for routers that won't let you change it.",
         })}
         action={
           <Btn
@@ -448,7 +448,7 @@ export default function Dhcp() {
             label={t("dhcp.rivals", { defaultValue: "Other DHCP servers" })}
             sub={t("dhcp.rivals_sub", {
               defaultValue:
-                "ferrite asks the network the way a new device would, and again every half hour while it serves.",
+                "Ferrite asks the network the way a new device would, and again every half hour while it serves.",
             })}
           >
             <div className="flex flex-wrap items-center justify-end gap-2">
@@ -606,7 +606,7 @@ export default function Dhcp() {
           title={t("dhcp.leases", { defaultValue: "Leases" })}
           sub={t("dhcp.leases_sub", {
             defaultValue:
-              "Who holds which address now. The name a device gives becomes its name everywhere in ferrite.",
+              "Who holds which address now. The name a device gives becomes its name everywhere in Ferrite.",
           })}
           icon={Users}
         >
@@ -755,7 +755,7 @@ export default function Dhcp() {
           title={t("dhcp.ra", { defaultValue: "IPv6 DNS announcements" })}
           sub={t("dhcp.ra_sub", {
             defaultValue:
-              "Tell IPv6 devices to use this box for DNS, so they don't slip past it over the router's IPv6. DNS only — ferrite never claims to be the router.",
+              "Tell IPv6 devices to use this box for DNS, so they don't slip past it over the router's IPv6. DNS only — Ferrite never claims to be the router.",
           })}
           icon={RadioTower}
         >

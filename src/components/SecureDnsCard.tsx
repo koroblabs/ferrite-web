@@ -308,12 +308,12 @@ export function SecureDnsCard() {
           le
             ? t("secure.cert_le_sub", {
                 defaultValue:
-                  "ferrite gets it for the name and *.name and renews it, proving the name with a TXT record through Cloudflare. No port has to be open for that.",
+                  "Ferrite gets it for the name and *.name and renews it, proving the name with a TXT record through Cloudflare. No port has to be open for that.",
               })
             : viaRelay
               ? t("secure.cert_relay_sub", {
                   defaultValue:
-                    "ferrite gets it from Let's Encrypt for the name and *.name and renews it; the relay answers the check. The key never leaves this box.",
+                    "Ferrite gets it from Let's Encrypt for the name and *.name and renews it; the relay answers the check. The key never leaves this box.",
                 })
               : t("secure.cert_sub", {
                   defaultValue:

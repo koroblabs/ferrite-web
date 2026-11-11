@@ -292,7 +292,7 @@ function DnsLookup() {
       title={t("tools.dns_lookup", { defaultValue: "DNS lookup" })}
       help={t("tools.dns_lookup_help", {
         defaultValue:
-          "Resolve a name through ferrite's upstream resolvers and show every record that comes back.",
+          "Resolve a name through Ferrite's upstream resolvers and show every record that comes back.",
       })}
       loading={loading}
       err={err}

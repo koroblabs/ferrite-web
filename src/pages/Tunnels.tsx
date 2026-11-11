@@ -435,7 +435,7 @@ export default function Tunnels() {
   );
 
   const hitsHint = t("tunnels.col_hits_hint", {
-    defaultValue: "Connections routed by this rule since ferrite started.",
+    defaultValue: "Connections routed by this rule since Ferrite started.",
   });
 
   // Rule hit counters keyed the same way the server reports them.
@@ -466,7 +466,7 @@ export default function Tunnels() {
         title={t("tunnels.title", { defaultValue: "Tunnels" })}
         subtitle={t("tunnels.subtitle", {
           defaultValue:
-            "Route chosen domains through a tunnel or proxy. Matching domains resolve to ferrite, which forwards them through the selected egress.",
+            "Route chosen domains through a tunnel or proxy. Matching domains resolve to Ferrite, which forwards them through the selected egress.",
         })}
         action={
           <Btn variant="ghost" onClick={() => void load()} disabled={loading}>
@@ -537,7 +537,7 @@ export default function Tunnels() {
               <SettingsPanel
                 title={t("tunnels.general", { defaultValue: "General" })}
                 sub={t("tunnels.general_sub", {
-                  defaultValue: "Master switch and how ferrite advertises itself to matching clients.",
+                  defaultValue: "Master switch and how Ferrite advertises itself to matching clients.",
                 })}
                 icon={SlidersHorizontal}
                 badge={

@@ -30,7 +30,7 @@ export function FerriteBrand({ collapsed, className, markClassName }: FerriteBra
       {!collapsed && (
         <span className="min-w-0">
           <span className="block text-[17px] font-semibold tracking-[-0.01em] text-heading">
-            ferrite
+            Ferrite
           </span>
         </span>
       )}

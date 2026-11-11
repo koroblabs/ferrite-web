@@ -143,7 +143,7 @@ export function ImportCard({ onRestarting }: { onRestarting: () => void }) {
       case "upstreams":
         return t("import.sum_upstreams", {
           defaultValue:
-            "{{count}} upstreams, {{zones}} forwarded zones — replaces yours and restarts ferrite",
+            "{{count}} upstreams, {{zones}} forwarded zones — replaces yours and restarts Ferrite",
           count: p.upstreams.length,
           zones: p.zones.length,
         });
@@ -166,7 +166,7 @@ export function ImportCard({ onRestarting }: { onRestarting: () => void }) {
       title={t("import.title", { defaultValue: "Move over from Pi-hole or AdGuard Home" })}
       sub={t("import.sub", {
         defaultValue:
-          "A Pi-hole v6 Teleporter export (.zip) or AdGuardHome.yaml. You see what comes over — and what can't — before anything changes; it's added beside what ferrite has.",
+          "A Pi-hole v6 Teleporter export (.zip) or AdGuardHome.yaml. You see what comes over — and what can't — before anything changes; it's added beside what Ferrite has.",
       })}
       footer={
         <div className="flex flex-wrap justify-end gap-2">

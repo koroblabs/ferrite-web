@@ -1046,7 +1046,7 @@ function SystemBar({ sys }: { sys: SystemStats }) {
           <>
             <span className="text-muted flex items-center gap-1.5 text-xs font-semibold">
               <span className="bg-ember/70 h-1.5 w-1.5 rounded-full" />
-              ferrite
+              Ferrite
             </span>
             <span className="text-xs">
               <span className="text-muted">{t("dashboard.mem")} </span>

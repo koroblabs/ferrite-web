@@ -270,7 +270,7 @@ export function NotificationsCard() {
           label={t("notifications.new_device", { defaultValue: "New devices" })}
           sub={t("notifications.new_device_sub", {
             defaultValue:
-              "A device the box has never seen joins the network. What is there when ferrite starts doesn't count. Phones that rotate their Wi-Fi address count as new each time.",
+              "A device the box has never seen joins the network. What is there when Ferrite starts doesn't count. Phones that rotate their Wi-Fi address count as new each time.",
           })}
         >
           <Switch

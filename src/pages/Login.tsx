@@ -24,7 +24,7 @@ export default function Login() {
       <div className="animate-fade-up w-full max-w-sm">
         <div className="mb-8 flex flex-col items-center text-center">
           <FerriteMark className="mb-5 h-16 w-16" />
-          <h1 className="display-title text-heading text-3xl">ferrite</h1>
+          <h1 className="display-title text-heading text-3xl">Ferrite</h1>
           <p className="text-muted mt-2 text-xs font-medium">
             DNS · Control · Plane
           </p>

@@ -50,7 +50,7 @@ export function BackupCard({
       t("backup.restore_confirm", {
         name: file.name,
         defaultValue:
-          "Restore \"{{name}}\"? It replaces the whole configuration and restarts ferrite. The current file is kept as config.toml.bak.",
+          "Restore \"{{name}}\"? It replaces the whole configuration and restarts Ferrite. The current file is kept as config.toml.bak.",
       }),
     );
     if (!ok) return;

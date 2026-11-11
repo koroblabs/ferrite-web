@@ -120,7 +120,7 @@ export function SyncCard({ onRestarting }: { onRestarting: () => void }) {
   return (
     <SettingsPanel
       icon={Server}
-      title={t("sync.title", { defaultValue: "Follow another ferrite" })}
+      title={t("sync.title", { defaultValue: "Follow another Ferrite" })}
       sub={t("sync.sub", {
         defaultValue:
           "Run two resolvers that answer alike: this box takes the chosen parts of a primary's configuration every few minutes, and restarts in place when something changed, without dropping a query. Edit on the primary.",
