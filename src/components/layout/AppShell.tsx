@@ -188,16 +188,17 @@ function NavItem({
         )}
       </span>
       {!collapsed && (
-        <span className="flex flex-1 items-center justify-between">
-          {label}
+        // The badge never shrinks and keeps its gap; a label too long for both
+        // gives way with an ellipsis instead of pushing the badge out.
+        <span className="flex min-w-0 flex-1 items-center justify-between gap-2">
+          <span className="truncate">{label}</span>
           {badge && (
             <span
               role="img"
               aria-label={badgeLabel}
               title={badgeLabel}
-              className="inline-flex items-center gap-1.5 rounded-xs border border-current/15 bg-warn/10 px-1.5 py-0.5 font-mono text-[10px] font-medium text-warn"
+              className="shrink-0 rounded-xs border border-current/15 bg-warn/10 px-1.5 py-0.5 font-mono text-[10px] font-medium text-warn"
             >
-              <span className="h-1.5 w-1.5 rounded-full bg-warn" />
               {badgeText}
             </span>
           )}
