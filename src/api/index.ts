@@ -50,11 +50,25 @@ import type {
 export const api = {
   // ── Auth ────────────────────────────────────────────────────────────────────
   checkAuth: auth.checkAuth,
+  authStatus: auth.status,
   login: (password: string) =>
     auth.login(password).then((d) => {
       setToken(d.token);
       return d;
     }),
+  /** A box with an API key and no password: the key signs the panel in, kept like a token. */
+  signInWithKey: async (key: string) => {
+    setToken(key);
+    const s = await auth.status().catch((e: unknown) => {
+      setToken(null);
+      throw e;
+    });
+    if (!s.authenticated) {
+      setToken(null);
+      throw new Error("wrong key");
+    }
+    return s;
+  },
   logout: () => auth.logout().finally(() => setToken(null)),
   sessions: auth.sessions,
   revokeSession: auth.revokeSession,

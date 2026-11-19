@@ -77,6 +77,10 @@ type RequestOpts = {
   rawContentType?: string;
   /** Hand back the response body as text rather than parsing JSON. */
   textResponse?: boolean;
+  /** A 401 is this call's answer (a wrong password), not "signed out": no trip to /login. */
+  quiet401?: boolean;
+  /** Statuses whose JSON body is the answer rather than an error (`GET /api/auth`, signed out). */
+  accept?: number[];
 };
 
 async function request<T>(
@@ -114,7 +118,9 @@ async function request<T>(
     signal: controller.signal,
   }).finally(() => clearTimeout(timeoutId));
 
-  if (res.status === 401) {
+  if (opts?.accept?.includes(res.status)) return (await res.json()) as T;
+
+  if (res.status === 401 && !opts?.quiet401) {
     setToken(null);
     window.location.pathname = "/login";
     throw new ApiClientError(i18n.t("errors.unauthorized"), {

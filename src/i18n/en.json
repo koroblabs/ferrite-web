@@ -496,7 +496,12 @@
     "password_label": "Password",
     "submit": "Sign in",
     "submitting": "Signing in…",
-    "invalid_password": "Invalid password"
+    "invalid_password": "Invalid password",
+    "api_key_label": "API key",
+    "api_key_only": "This box has an API key and no password, so the panel signs in with the key. Once in, set a password or remove the key in Settings.",
+    "invalid_api_key": "Invalid API key",
+    "no_password": "This box has no password: anyone on your network can open the panel.",
+    "open_panel": "Open the panel"
   },
   "errors": {
     "bad_request": "Invalid request.",
@@ -510,6 +515,8 @@
     "password_empty": "Password cannot be empty. Disable password login instead.",
     "password_hash_failed": "Could not save the new password.",
     "api_key_empty": "API key cannot be empty. Clear it instead.",
+    "password_kept_for_api_key": "The API key needs a password: without one the panel can't sign in. Remove the API key first, then the password.",
+    "api_key_needs_password": "An API key needs a password: without one the panel can't sign in. Set a password first.",
     "dns_min_ttl_range": "Minimum DNS TTL must be between 0 and 86,400 seconds.",
     "dns_max_ttl_range": "Maximum DNS TTL must be between 0 and 86,400 seconds.",
     "dns_ttl_order": "Minimum DNS TTL cannot be greater than maximum DNS TTL.",

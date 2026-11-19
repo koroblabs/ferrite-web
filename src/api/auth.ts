@@ -6,9 +6,14 @@ export function checkAuth(): Promise<AuthStatus> {
   return http.get("/auth");
 }
 
+/** Where this browser stands, signed in or not — the answer either way, no trip to /login. */
+export function status(): Promise<AuthStatus> {
+  return http.get("/auth", { accept: [401], quiet401: true });
+}
+
 /** Authenticate with password, receive a session token (7 days since last use) */
 export function login(password: string): Promise<LoginResponse> {
-  return http.post("/auth", { password });
+  return http.post("/auth", { password }, { quiet401: true });
 }
 
 /** Invalidate the current session token */

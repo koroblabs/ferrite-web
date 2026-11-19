@@ -97,8 +97,8 @@ function RequireAuth({ children }: { children: ReactNode }) {
       .checkAuth()
       .then((d) => {
         if (cancelled) return;
-        setNoPassword(!d.password_set);
-        setStatus(!d.password_set || d.authenticated ? "ok" : "unauth");
+        setNoPassword(!d.password_set && !d.api_key_only);
+        setStatus(d.authenticated ? "ok" : "unauth");
       })
       .catch((e) => {
         if (cancelled) return;

@@ -5,6 +5,8 @@
 export interface AuthStatus {
   authenticated: boolean;
   password_set: boolean;
+  /** An API key and no password: the key is what signs the panel in. */
+  api_key_only?: boolean;
 }
 
 export interface LoginResponse {

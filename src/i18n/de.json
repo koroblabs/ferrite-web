@@ -496,7 +496,12 @@
     "password_label": "Passwort",
     "submit": "Anmelden",
     "submitting": "Melde an...",
-    "invalid_password": "Ungültiges Passwort"
+    "invalid_password": "Ungültiges Passwort",
+    "api_key_label": "API-Key",
+    "api_key_only": "Diese Box hat einen API-Key, aber kein Passwort, also meldet sich das Panel mit dem Key an. Lege danach in den Einstellungen ein Passwort fest oder entferne den Key.",
+    "invalid_api_key": "Ungültiger API-Key",
+    "no_password": "Diese Box hat kein Passwort: Jeder in deinem Netzwerk kann das Panel öffnen.",
+    "open_panel": "Panel öffnen"
   },
   "errors": {
     "bad_request": "Ungültige Anfrage.",
@@ -510,6 +515,8 @@
     "password_empty": "Das Passwort darf nicht leer sein. Deaktiviere stattdessen die Passwort-Anmeldung.",
     "password_hash_failed": "Das neue Passwort konnte nicht gespeichert werden.",
     "api_key_empty": "Der API-Key darf nicht leer sein. Lösche ihn stattdessen.",
+    "password_kept_for_api_key": "Der API-Key braucht ein Passwort: Ohne eines kann sich das Panel nicht anmelden. Entferne zuerst den API-Key, dann das Passwort.",
+    "api_key_needs_password": "Ein API-Key braucht ein Passwort: Ohne eines kann sich das Panel nicht anmelden. Lege zuerst ein Passwort fest.",
     "dns_min_ttl_range": "Der minimale DNS-TTL muss zwischen 0 und 86.400 Sekunden liegen.",
     "dns_max_ttl_range": "Der maximale DNS-TTL muss zwischen 0 und 86.400 Sekunden liegen.",
     "dns_ttl_order": "Der minimale DNS-TTL darf nicht größer als der maximale DNS-TTL sein.",

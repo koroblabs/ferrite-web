@@ -496,7 +496,12 @@
     "password_label": "Mot de passe",
     "submit": "Se connecter",
     "submitting": "Connexion...",
-    "invalid_password": "Mot de passe invalide"
+    "invalid_password": "Mot de passe invalide",
+    "api_key_label": "Clé API",
+    "api_key_only": "Cette box a une clé API et aucun mot de passe : le panneau se connecte donc avec la clé. Une fois connecté, définissez un mot de passe ou supprimez la clé dans les Paramètres.",
+    "invalid_api_key": "Clé API invalide",
+    "no_password": "Cette box n'a pas de mot de passe : n'importe qui sur votre réseau peut ouvrir le panneau.",
+    "open_panel": "Ouvrir le panneau"
   },
   "errors": {
     "bad_request": "Requête invalide.",
@@ -510,6 +515,8 @@
     "password_empty": "Le mot de passe ne peut pas être vide. Désactivez plutôt la connexion par mot de passe.",
     "password_hash_failed": "Impossible d'enregistrer le nouveau mot de passe.",
     "api_key_empty": "La clé API ne peut pas être vide. Effacez-la plutôt.",
+    "password_kept_for_api_key": "La clé API a besoin d'un mot de passe : sans lui, le panneau ne peut pas se connecter. Supprimez d'abord la clé API, puis le mot de passe.",
+    "api_key_needs_password": "Une clé API a besoin d'un mot de passe : sans lui, le panneau ne peut pas se connecter. Définissez d'abord un mot de passe.",
     "dns_min_ttl_range": "Le TTL DNS minimum doit être entre 0 et 86 400 secondes.",
     "dns_max_ttl_range": "Le TTL DNS maximum doit être entre 0 et 86 400 secondes.",
     "dns_ttl_order": "Le TTL DNS minimum ne peut pas être supérieur au maximum.",
