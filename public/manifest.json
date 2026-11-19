@@ -1,0 +1,14 @@
+{
+  "name": "Ferrite",
+  "short_name": "Ferrite",
+  "id": ".",
+  "start_url": ".",
+  "scope": ".",
+  "display": "standalone",
+  "background_color": "#0e0c0a",
+  "theme_color": "#0e0c0a",
+  "icons": [
+    { "src": "favicon.svg", "sizes": "any", "type": "image/svg+xml" },
+    { "src": "apple-touch-icon.png", "sizes": "180x180", "type": "image/png" }
+  ]
+}
