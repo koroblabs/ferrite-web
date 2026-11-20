@@ -94,7 +94,7 @@ export function defaultPort(type: string): string {
   return "53";
 }
 
-function upstreamToDraft(upstream: UpstreamConfig): UpstreamDraft {
+export function upstreamToDraft(upstream: UpstreamConfig): UpstreamDraft {
   return {
     ...DEFAULT_UPSTREAM_DRAFT,
     type: upstream.type || "plain",
@@ -107,7 +107,7 @@ function upstreamToDraft(upstream: UpstreamConfig): UpstreamDraft {
   };
 }
 
-function draftToUpstream(draft: UpstreamDraft): UpstreamConfig {
+export function draftToUpstream(draft: UpstreamDraft): UpstreamConfig {
   const type = draft.type || "plain";
   if (type === "https") {
     const upstream: UpstreamConfig = { type, url: draft.url.trim() };

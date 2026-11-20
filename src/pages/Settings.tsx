@@ -3,6 +3,7 @@ import type { ChangeEvent, SubmitEvent, InputHTMLAttributes } from "react";
 import { useTranslation } from "react-i18next";
 import { useRowKeys } from "@/hooks/use-row-keys";
 import {
+  Activity,
   Save,
   RefreshCw,
   Download,
@@ -73,6 +74,9 @@ import type {
   StorageSuggestion,
   UpdateApplyResponse,
   UpdateCheckResponse,
+  UpstreamConfig,
+  UpstreamProbe,
+  UpstreamStatus,
 } from "@/api/types";
 import {
   DEFAULT_UPSTREAM_DRAFT,
@@ -80,8 +84,10 @@ import {
   buildHotPatch,
   buildRestartPatch,
   defaultPort,
+  draftToUpstream,
   hotFormFromSettings,
   restartFormFromSettings,
+  upstreamToDraft,
 } from "@/lib/settings-form";
 import { Segmented } from "@/components/ui/segmented";
 import type {
@@ -353,14 +359,106 @@ function TypeSegments({ value, onChange }: { value: string; onChange: (type: str
   );
 }
 
+/** A row's try: under way, or what it found. */
+export type UpstreamChecks = Record<number, UpstreamProbe | "busy">;
+
+/** The same upstream, whichever way it was written down. */
+function sameUpstream(draft: UpstreamDraft, saved: UpstreamConfig | undefined): boolean {
+  if (!saved) return false;
+  return (
+    JSON.stringify(draftToUpstream(draft)) ===
+    JSON.stringify(draftToUpstream(upstreamToDraft(saved)))
+  );
+}
+
+/** How a saved upstream has been answering the box's queries. */
+function UpstreamHealth({ live }: { live: UpstreamStatus }) {
+  const { t } = useTranslation();
+  if (live.state === "ok")
+    return (
+      <Tag tone="cached" title={live.label}>
+        {t("settings.upstream_state_ok")}
+        {live.latency_ms != null && ` · ${live.latency_ms} ms`}
+      </Tag>
+    );
+  if (live.state === "failing")
+    return (
+      <Tag tone="blocked" title={live.last_error ?? live.label}>
+        {t("settings.upstream_state_failing")}
+      </Tag>
+    );
+  return (
+    <Tag tone="muted" title={live.label}>
+      {t("settings.upstream_state_unknown")}
+    </Tag>
+  );
+}
+
+/** Under a row: what its try found, or else why the box's queries to it fail. */
+function UpstreamFinding({
+  check,
+  live,
+}: {
+  check: UpstreamProbe | "busy" | undefined;
+  live: UpstreamStatus | undefined;
+}) {
+  const { t } = useTranslation();
+  if (check && check !== "busy") {
+    return check.ok ? (
+      <p className="mt-2 text-[11px] text-cached">
+        {t("settings.upstream_answered", { ms: check.ms ?? 0 })}
+      </p>
+    ) : (
+      <p className="mt-2 font-mono text-[11px] leading-snug break-words text-blocked">
+        {check.error}
+      </p>
+    );
+  }
+  if (live?.state === "failing" && live.last_error)
+    return (
+      <p className="mt-2 font-mono text-[11px] leading-snug break-words text-blocked">
+        {live.last_error}
+        {live.retry_in != null && (
+          <span className="text-muted">
+            {" · "}
+            {t("settings.upstream_retry_in", { s: live.retry_in })}
+          </span>
+        )}
+      </p>
+    );
+  return null;
+}
+
 function UpstreamEditor({
   value,
   onChange,
+  saved,
+  status,
+  checks,
+  setChecks,
 }: {
   value: UpstreamDraft[];
   onChange: (next: UpstreamDraft[]) => void;
+  /** The upstreams as saved, which `status` follows, in the same order. */
+  saved: UpstreamConfig[];
+  status: UpstreamStatus[];
+  checks: UpstreamChecks;
+  setChecks: (update: (prev: UpstreamChecks) => UpstreamChecks) => void;
 }) {
   const { t } = useTranslation();
+
+  async function test(index: number) {
+    setChecks((c) => ({ ...c, [index]: "busy" }));
+    try {
+      const found = await api.testUpstream(draftToUpstream(value[index]));
+      setChecks((c) => ({ ...c, [index]: found }));
+    } catch (e) {
+      setChecks((c) => ({
+        ...c,
+        [index]: { label: "", ok: false, ms: null, error: (e as Error).message },
+      }));
+    }
+  }
   // Egresses (tunnels) available to route a resolver through. Best-effort: an
   // empty list just means the "Through tunnel" dropdown offers only "Direct".
   const [egresses, setEgresses] = useState<{ id: string; name: string }[]>([]);
@@ -372,6 +470,11 @@ function UpstreamEditor({
   }, []);
 
   function update(index: number, patch: Partial<UpstreamDraft>) {
+    // A try was of the row as it was.
+    setChecks((c) => {
+      const { [index]: _, ...rest } = c;
+      return rest;
+    });
     onChange(
       value.map((item, i) => {
         if (i !== index) return item;
@@ -387,6 +490,7 @@ function UpstreamEditor({
 
   function remove(index: number) {
     if (value.length <= 1) return;
+    setChecks(() => ({}));
     onChange(value.filter((_, i) => i !== index));
   }
 
@@ -404,15 +508,31 @@ function UpstreamEditor({
               </span>
               <TypeSegments value={item.type} onChange={(type) => update(index, { type })} />
             </div>
-            <button
-              type="button"
-              onClick={() => remove(index)}
-              disabled={value.length <= 1}
-              className="text-muted transition-colors hover:text-blocked disabled:opacity-30"
-              title={t("common.delete")}
-            >
-              <Trash2 size={13} />
-            </button>
+            <div className="flex items-center gap-2">
+              {sameUpstream(item, saved[index]) && status[index] && (
+                <UpstreamHealth live={status[index]} />
+              )}
+              <Btn
+                type="button"
+                variant="ghost"
+                onClick={() => void test(index)}
+                disabled={checks[index] === "busy"}
+                title={t("settings.upstream_test_title")}
+                className="px-2 py-1 text-[11px]"
+              >
+                <Activity size={11} />
+                {checks[index] === "busy" ? t("settings.upstream_testing") : t("settings.upstream_test")}
+              </Btn>
+              <button
+                type="button"
+                onClick={() => remove(index)}
+                disabled={value.length <= 1}
+                className="text-muted transition-colors hover:text-blocked disabled:opacity-30"
+                title={t("common.delete")}
+              >
+                <Trash2 size={13} />
+              </button>
+            </div>
           </div>
 
           {item.type === "https" ? (
@@ -509,6 +629,11 @@ function UpstreamEditor({
                 </span>
               </label>
             )}
+
+          <UpstreamFinding
+            check={checks[index]}
+            live={sameUpstream(item, saved[index]) ? status[index] : undefined}
+          />
         </div>
       ))}
 
@@ -823,6 +948,20 @@ export default function Settings() {
   const toast = useToast();
 
   const [settings, setSettings] = useState<SettingsType | null>(null);
+  const [upstreamStatus, setUpstreamStatus] = useState<UpstreamStatus[]>([]);
+  const [upstreamChecks, setUpstreamChecks] = useState<UpstreamChecks>({});
+  const refreshUpstreamStatus = useCallback(() => {
+    // A box before 0.2.3 has no such list: nothing shown, nothing broken.
+    api
+      .upstreamStatus()
+      .then(setUpstreamStatus)
+      .catch(() => {});
+  }, []);
+  useEffect(() => {
+    refreshUpstreamStatus();
+    const timer = setInterval(refreshUpstreamStatus, 15_000);
+    return () => clearInterval(timer);
+  }, [refreshUpstreamStatus]);
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState("");
 
@@ -1001,6 +1140,13 @@ export default function Settings() {
     try {
       const res = await api.patchSettings(patch);
       window.dispatchEvent(new Event("ferrite:settings-changed"));
+      // Saved either way; the upstreams that didn't answer say why, each under its row.
+      const checks = res.upstream_checks;
+      if (checks) {
+        setUpstreamChecks(Object.fromEntries(checks.map((c, i) => [i, c])));
+        refreshUpstreamStatus();
+      }
+      const silent = checks?.filter((c) => !c.ok).length ?? 0;
       if (patch.api_key) setApiKeySet(true);
       if (patch.password) setPasswordSet(true);
       if (res.restart_required) {
@@ -1008,7 +1154,8 @@ export default function Settings() {
         setForm((p) => ({ ...p, api_key: "", password: "" }));
         pollUntilBack();
       } else {
-        toast(t("settings.settings_saved"));
+        if (silent) toast(t("settings.saved_upstreams_silent", { count: silent }), "error");
+        else toast(t("settings.settings_saved"));
         await loadSettings();
         setForm((p) => ({ ...p, api_key: "", password: "" }));
       }
@@ -1535,6 +1682,10 @@ export default function Settings() {
                   <UpstreamEditor
                     value={restartForm.upstream}
                     onChange={(upstream) => setRestartForm((p) => ({ ...p, upstream }))}
+                    saved={settings?.upstream ?? []}
+                    status={upstreamStatus}
+                    checks={upstreamChecks}
+                    setChecks={setUpstreamChecks}
                   />
                 </SettingBlock>
               </SettingsPanel>

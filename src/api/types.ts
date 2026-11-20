@@ -783,6 +783,30 @@ export interface PatchSettingsResponse {
   persisted: boolean;
   saved_to?: string;
   restart_required: boolean;
+  /** When the upstreams changed: each one tried after the save, in order. */
+  upstream_checks?: UpstreamProbe[];
+}
+
+/** One upstream tried over a connection of its own. */
+export interface UpstreamProbe {
+  label: string;
+  ok: boolean;
+  /** The round trip, when it answered. */
+  ms: number | null;
+  /** Why it didn't, in the transport's own words. */
+  error: string | null;
+}
+
+/** How a configured upstream is doing, from the queries it got. */
+export interface UpstreamStatus {
+  label: string;
+  state: "ok" | "failing" | "unknown";
+  last_error: string | null;
+  failing_since: number | null;
+  last_ok: number | null;
+  latency_ms: number | null;
+  /** Seconds until it's tried again, while failing. */
+  retry_in: number | null;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

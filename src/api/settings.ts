@@ -4,6 +4,9 @@ import type {
   PatchSettingsBody,
   PatchSettingsResponse,
   StorageLocations,
+  UpstreamConfig,
+  UpstreamProbe,
+  UpstreamStatus,
 } from "./types";
 
 /** Full current config (api_key is redacted as "***" if set) */
@@ -23,4 +26,14 @@ export function patch(body: PatchSettingsBody): Promise<PatchSettingsResponse> {
  *  RAM-backed mounts ferrite can write to, and the location in use. */
 export function locations(): Promise<StorageLocations> {
   return http.get("/storage/locations");
+}
+
+/** Each configured upstream, in order: answering, failing (and why), not asked yet. */
+export function upstreamStatus(): Promise<UpstreamStatus[]> {
+  return http.get("/upstreams/status");
+}
+
+/** Try one upstream as the form has it, saved or not. */
+export function testUpstream(upstream: UpstreamConfig): Promise<UpstreamProbe> {
+  return http.post("/upstreams/test", upstream, { timeoutMs: 20_000 });
 }

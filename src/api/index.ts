@@ -175,6 +175,8 @@ export const api = {
 
   getSettings: settings.get,
   patchSettings: (body: PatchSettingsBody) => settings.patch(body),
+  upstreamStatus: settings.upstreamStatus,
+  testUpstream: settings.testUpstream,
   storageLocations: settings.locations,
 
   // ── Proxy / Tunnels ───────────────────────────────────────────────────────────
